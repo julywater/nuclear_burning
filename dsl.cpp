@@ -1,3 +1,5 @@
+//This is a sparse linear system solver using dens storage. It is specially designed for solving 7 isotopes nuclear network integration.
+//Efficient for small sparse matrix.
 #include<iostream>
 #include<math.h>
 #include <stdlib.h> 
