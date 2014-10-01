@@ -1,5 +1,7 @@
 //This is a sparse linear system solver using dens storage. It is specially designed for solving 7 isotopes nuclear network integration.
 //Efficient for small sparse matrix.
+//Gaussian Factorizaton with partial pivoting
+//pursue speed in sacrifice of memory usage
 #include<iostream>
 #include<math.h>
 #include <stdlib.h> 
