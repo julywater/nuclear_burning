@@ -175,16 +175,41 @@ void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 	dfdy[ni56][si28]=rate[irsi2nidsi]*y[he4];
 	dfdy[ni56][ni56]=-rate[irni2si];
 }
+void ydot(double rate[NRATE],double y[N],double dydt[N]){
+	dydt[he4]= 3.0 * y[c12]* rate[irg3a]\
+- 3.0 * y[he4]*y[he4]*y[he4]* rate[ir3a]+ y[o16]* rate[iroga]- y[c12]*y[he4]* rate[ircag]\
++ y[c12]*y[c12]*rate[ir1212]+0.5* y[c12]*y[o16]*rate[ir1216]+y[o16]*y[o16]*rate[ir1616]\
+- y[o16]* y[he4]*rate[iroag]+y[ne20]*rate[irnega]+y[mg24]* rate[irmgga]-y[ne20]* y[he4]*rate[irneag]\
++ y[si28]*rate[irsiga]-y[mg24]*y[he4]*rate[irmgag]-7.0*rate[irsi2ni]*y[he4]+7.0*rate[irni2si]*y[ni56];
+
+	
+	dydt[c12]= y[he4]*y[he4]*y[he4]*rate[ir3a] - y[c12]* rate[irg3a] + y[o16] * rate[iroga] - y[c12]*y[he4]*rate[ircag]-2.0* y[c12]*y[c12]*rate[ir1212]\
+- y[c12]*y[o16]*rate[ir1216];
+
+	dydt[o16]= - y[o16]*rate[iroga]+y[c12]*y[he4]*rate[ircag]-y[c12]*y[o16]*rate[ir1216]-2.0*y[o16]*y[o16]*rate[ir1616]-y[o16]*y[he4]*rate[iroag]+y[ne20]*rate[irnega];
+
+	dydt[ne20]= y[c12]*y[c12]*rate[ir1212]+y[o16]*y[he4]*rate[iroag]-y[ne20]*rate[irnega] + y[mg24]*rate[irmgga]- y[ne20]*y[he4]*rate[irneag];
+	
+	dydt[mg24]=0.5*y[c12]*y[o16]*rate[ir1216]-y[mg24]*rate[irmgga]  + y[ne20]*y[he4]*rate[irneag]+y[si28]*rate[irsiga] - y[mg24]*y[he4]*rate[irmgag];
+	
+	dydt[si28]=0.5*y[c12]*y[o16]*rate[ir1216]+y[o16]*y[o16]*rate[ir1616] - y[si28]*rate[irsiga] + y[mg24]*y[he4]*rate[irmgag] - rate[irsi2ni]*y[he4] + rate[irni2si]*y[ni56];
+	
+	dydt[ni56]=rate[irsi2ni]*y[he4] - rate[irni2si]*y[ni56];
+	}
+
+
 
 int main(){
 	double y[N]={0.1,0.4,0.5,0,0,0,0};
 	double rate[NRATE];
 	double dfdy[N][N];
+	double dydt[N];
 	double temp=1e8;
 	double dens=1e6;
 	clock_t t=clock();
 	for(int i=0;i<1e6;i++){
 		get_rate(temp,dens,y,rate);
+		ydot(rate,y,dydt);
 		jacob(rate,y,dfdy);
 	}
 	t=clock()-t;
