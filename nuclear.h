@@ -1,7 +1,10 @@
-#define N 7
-#define NRATE 20
+#include<iostream>
+#include<stdlib.h>
 #include<math.h>
 #include<stdio.h>
+#include<string.h>
+#define N 7
+#define NRATE 2
 using namespace std;
 class Linear_system{
 	private :
