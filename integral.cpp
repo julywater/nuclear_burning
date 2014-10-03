@@ -16,9 +16,9 @@ void nuclear_step(double rho,double temp,double y[N]){
 	double B[N]={0};
 	get_rate(rho,temp,y,rate);
 	Form_Matrix(dt,rate,y,A,B);
-//	L.initial(A,B);
-//	L.naivfct();
-//	L.backward();
-//	L.CleanMatrix();
+	L.initial(A,B);
+	L.naivfct();
+	L.backward();
+	L.CleanMatrix();
 }
 
