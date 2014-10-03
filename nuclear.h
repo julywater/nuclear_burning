@@ -1,13 +1,7 @@
-//This is a sparse linear system solver using dens storage. It is specially designed for solving 7 isotopes nuclear network integration.
-//Efficient for small sparse matrix.
-//Gaussian Factorizaton with partial pivoting
-//pursue speed in sacrifice of memory usage
-#include<iostream>
-#include<math.h>
-#include <stdlib.h> 
-#include<time.h>
-#include <stdio.h>
 #define N 7
+#define NRATE 20
+#include<math.h>
+#include<stdio.h>
 using namespace std;
 class Linear_system{
 	private :
@@ -20,7 +14,7 @@ class Linear_system{
 	double b[N];
 	
 	public :
-	Matrix(){
+	Linear_system(){
 		for(int row=0;row<N;row++)
 			for(int col=0;col<N;col++){
 				a[row][col]=0;
@@ -163,35 +157,6 @@ class Linear_system{
 		}
 	}
 };
-
-
-int main(){
-    Matrix A;
-    srand (time(NULL));
-    double ap[N][N];
-    for(int i=0;i<N;i++)
-  	  for(int j=0;j<N;j++){
-    		if(i<2||j<2||abs(i-j)<2)
-    			ap[i][j]=rand()% 10 + 1;
-  		else ap[i][j]=0;
-         }
-/*     
-    for(int row=0;row<N;row++){
-    	for(int col=0;col<N;col++)
-        	cout<<ap[row][col]<<"   ";
-        cout<<"\n";
-                }	
-*/	
-	clock_t t=clock();
-	for(int i=0;i<1e6;i++){
-	A.initial(ap);
-	A.naivfct();
-	A.backward();
-	A.CleanMatrix();
-	}
-	t = clock() - t;
-	printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
-//	A.print(ap);
-	return(0);
-	
-}	
+void get_rate(double,double ,double [],double []);
+void jacob(double [],double [],double [N][N]);
+void ydot(double [],double [],double []);
