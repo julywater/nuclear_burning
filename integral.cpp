@@ -21,4 +21,10 @@ void nuclear_step(double rho,double temp,double y[N]){
 	L.backward();
 	L.CleanMatrix();
 }
-
+int main(){
+	double rho=1e6;
+	double temp=1e9;
+	double y[N]={0.1,0.4,0.5,0,0,0,0};
+	nuclear_step(rho,temp,y);
+	return(0);
+}	
