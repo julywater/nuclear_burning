@@ -158,6 +158,10 @@ class Linear_system{
 			cout<<total<<endl;
 		}
 	}
+	void add(double y[N]){
+		for(int i=0;i<N;i++)
+			y[i]+=b[piv[i]];
+	}
 };
 void get_rate(double,double ,double [],double []);
 void jacob(double [],double [],double [N][N]);
