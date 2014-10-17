@@ -198,7 +198,7 @@ void ydot(double rate[NRATE],double y[N],double dydt[N]){
 	}
 
 
-
+/*
 int main(){
 	double y[N]={0.1,0.4,0.5,0,0,0,0};
 	double rate[NRATE];
@@ -216,4 +216,4 @@ int main(){
 	printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
 	return(0);
 }
-	
+*/	
