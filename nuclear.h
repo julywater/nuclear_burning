@@ -1,10 +1,9 @@
-#include<iostream>
-#include<stdlib.h>
+#define N 7
+#define NRATE 20
 #include<math.h>
 #include<stdio.h>
+#include<iostream>
 #include<string.h>
-#define N 7
-#define NRATE 2
 using namespace std;
 class Linear_system{
 	private :
@@ -158,6 +157,10 @@ class Linear_system{
 				total+=b[piv[j]]*ap[i][j];
 			cout<<total<<endl;
 		}
+	}
+	void add(double y[N]){
+		for(int i=0;i<N;i++)
+			y[i]+=b[piv[i]];
 	}
 };
 void get_rate(double,double ,double [],double []);

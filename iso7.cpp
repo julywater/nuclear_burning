@@ -204,16 +204,18 @@ int main(){
 	double rate[NRATE];
 	double dfdy[N][N];
 	double dydt[N];
-	double temp=1e8;
+	double temp=1e9;
 	double dens=1e6;
 	clock_t t=clock();
-	for(int i=0;i<1e6;i++){
+//	for(int i=0;i<1e6;i++){
 		get_rate(temp,dens,y,rate);
 		ydot(rate,y,dydt);
-		jacob(rate,y,dfdy);
-	}
-	t=clock()-t;
-	printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
+//		jacob(rate,y,dfdy);
+//	}
+//	t=clock()-t;
+//	printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
+	for(int i=0;i<N;i++)
+		cout<<dydt[i]<<endl;
 	return(0);
 }
 */	
