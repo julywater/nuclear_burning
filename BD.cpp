@@ -4,6 +4,7 @@
 #include<stdio.h>
 #include<iostream>
 #include<string.h>
+#include"nuclear.h"
 using namespace std;
 double findmax(double e[N]){
 	double maxvalue=0;
@@ -24,7 +25,8 @@ void BD_onestep(double H,int m,double y[N]){
 	nuc.f(y,B); //B=f(y)
 	double delta[N];
 	double x[N];
-	delta=L.backward(B);
+	L.backward(B,delta);
+	//delta=A^-1*B
 	y=y+delta;
 	for(int k=1;k<=m-1;k++){
 		nuc.f(y,B);
