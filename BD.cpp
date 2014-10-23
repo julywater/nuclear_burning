@@ -1,9 +1,5 @@
 //instead of backwoard Euler we want some adaptive time step algorithm.
 //High order Bader-Deuflhard semi-implicit method 
-#include<math.h>
-#include<stdio.h>
-#include<iostream>
-#include<string.h>
 #include"nuclear.h"
 using namespace std;
 double findmax(double e[N]){
@@ -20,9 +16,10 @@ void extroplate(double T11[N],double T21[N]){
 		T21[i]=T21[i]+(T21[i]-T11[i])/8.0;
 	}
 	
-void BD_onestep(double H,int m,double y[N]){
+void BD_onestep(double H,int m,double y[N],double rate[N],double J[N][N]){
 	double h=H/m;
 	double A[N][N];
+	double B[N];
 	for(int i=0;i<N;i++)
 		for(int j=0;j<N;j++){
 				A[i][j]=-J[i][j];
@@ -30,26 +27,28 @@ void BD_onestep(double H,int m,double y[N]){
 		}		 //	A=1/h-J;
 	Linear_system L(A);
 	L.naivfct();
-	nuc.f(y,B); //B=f(y)
+	ydot(rate,y,B); //B=f(y)
 	double delta[N];
 	double x[N];
 	L.backward(B,delta);
 	//delta=A^-1*B
-	y=y+delta;
+	for(int i=0;i<N;i++)
+		y[i]+=delta[i];
+	//y=y+delta;
 	for(int k=1;k<=m-1;k++){
-		nuc.f(y,B);
+		ydot(rate,y,B);
 		for(int i=0;i<N;i++)
 			B[i]-=delta[i]/h;
 		//B=f(y)-delta/h
 		L.backward(B,x);
 		for(int i=0;i<N;i++){
-			delta[i]+=2*x;
+			delta[i]+=2*x[i];
 			y[i]+=delta[i];
 		}
 		//delta=delta+2x
 		//y=y+delta;
 	}
-	nuc.f(y,B);
+	ydot(rate,y,B);
 	for(int i=0;i<N;i++)
 		B[i]-=delta[i]/h;
 	//B=f(y)-delta/h;
@@ -60,28 +59,33 @@ void BD_onestep(double H,int m,double y[N]){
 	//y=y+delta
 }
 
-int BS_Method(double &H,double y0[N],bool redo=false){
-	double fact=0.8
+int BS_Method(double &H,double y0[N],double rate[N],double J[N][N],bool redo=false){
+	double fact=0.8;
 //	bool redo=false;
 	int m=2;
-	double y2[N]=y0[N];
-	double y6[N]=y0[N];
-	BD_onestep(m,y2);
+	double y2[N];
+	double y6[N];
+	for(int i=0;i<N;i++){
+		y2[i]=y0[i];
+		y6[i]=y0[i];
+	}
+	BD_onestep(H,m,y2,rate,J);
 	m=6;
-	BD_onestep(H,m,y6);
+	BD_onestep(H,m,y6,rate,J);
 	extroplate(y2,y6);
 	//ynew=extroplate(y2,y6);
 	double error[N];
 	for(int i=0;i<N;i++)
 		error[i]=fabs(y6[i]-y2[i]);
 	//error=|y6-y2|;
-	emin=findmin(error);
-	if (emin>TOL&&redo=false){
-		H=pow(TOL/emin,0.2)*H*fact;
+	double emax=findmax(error);
+	double TOL=1e-4;
+	if (emax>TOL&&redo==false){
+		H=pow(TOL/emax,0.2)*H*fact;
 		redo=true;
 	}
 	else{
-		H=pow(TOL/emin,0.2)*H*fact;
+		H=pow(TOL/emax,0.2)*H*fact;
 		redo=false;
 		for(int i=0;i<N;i++)
 			y0[i]=y6[i];
@@ -92,20 +96,28 @@ int BS_Method(double &H,double y0[N],bool redo=false){
 	
 int main(){
 		bool redo=false;
-		double time=0;
 		double H0=1.0;
 		double H=H0;
+		const double rho=1e7;
+		const double temp=2e9;
+		double time=0.0;
+		double time_end=1.0;
+		int count=0;
+		double y0[N];
+		double rate[N];
+		double J[N][N];
+		get_rate(temp,rho,y0,rate);
+		jacob(rate,y0,J);
 		while(time<time_end){
-			redo=BS_Method(H,y0,redo);
+			redo=BS_Method(H,y0,rate,J,redo);
 			if(redo=true){
 				time+=H;
-				BS_Method(H,y0);
+				BS_Method(H,y0,rate,J,redo);
 			}
 			else
 				time+=H0;
 			H0=H;
+			count++;
 		}
+		return(0);
 }
-		
-
-		
