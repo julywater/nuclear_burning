@@ -12,6 +12,14 @@ double findmax(double e[N]){
 		if(e[i]>maxvalue) maxvalue=e[i];
 	return maxvalue;
 }
+
+void extroplate(double T11[N],double T21[N]){
+	//polynomial extrapolation
+//	T22=T21+(T21-T11)/(pow((6.0/2.0),2)-1); but we will overwrite T21
+	for(int i=0;i<N;i++)
+		T21[i]=T21[i]+(T21[i]-T11[i])/8.0;
+	}
+	
 void BD_onestep(double H,int m,double y[N]){
 	double h=H/m;
 	double A[N][N];
