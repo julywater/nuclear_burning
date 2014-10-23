@@ -16,7 +16,7 @@ class Linear_system{
 	double b[N];
 	
 	public :
-	Linear_system(){
+	Linear_system(double A[N][N]){
 		for(int row=0;row<N;row++)
 			for(int col=0;col<N;col++){
 				a[row][col]=0;
@@ -29,6 +29,10 @@ class Linear_system{
 			nzc[ind]=0;
 			piv[ind]=0;
 		}
+		for(int row=0;row<N;row++)
+			for(int col=0;col<N;col++)
+				if(A[row][col]!=0) *GetElementAddress(row,col)=A[row][col];
+		
 	}
 	void initial(double A[N][N],double B[N]){
 	
@@ -116,12 +120,11 @@ class Linear_system{
 		}
 //		invpiv={3,4,0,1,2,5,6};
 	}
-	void backward(){
-//		for(int k=0;k<N;k++)
-//			if(piv[k]>k) {
-//				std::swap(b[piv[k]],b[k]);
-//				std::swap(a[piv[k]],a[k]);
-//			}
+	void backward(double B[N],double x[N]){
+		
+		for(int ind=0;ind<N;ind++)
+			b[ind]=B[ind];
+	
 		for(int k=0;k<N;k++){
 			for(int i=k+1;i<N;i++){
 				int pvr=piv[i];
@@ -138,6 +141,8 @@ class Linear_system{
 				total+=a[pvr][j]*b[piv[j]];
 			b[pvr]=(b[pvr]-total)*a[pvr][i];
 		}
+		for(int i=0;i<N;i++)
+			x[i]=b[piv[i]];
 	}	
 	void print(double ap[N][N]){
 		for(int row=0;row<N;row++){
