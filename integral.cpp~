@@ -18,14 +18,15 @@ void Form_Matrix(double &dt,double rate[NRATE],double y[N],double A[N][N],double
 double nuclear_step(double dt,double rho,double temp,double y[N]){
 //	double dt=0.01;  //need to have a get_dt() function;to be done
 	double rate[NRATE];
+	Linear_system L;
 	double A[N][N];
 	double B[N]={0};
-	get_rate(temp,rho,rate);
+	get_rate(temp,rho,y,rate);
 	Form_Matrix(dt,rate,y,A,B);
 
-	Linear_system L(A);
+	L.initial(A,B);
 	L.naivfct();
-	L.backward(B);
+	L.backward();
 	L.add(y);
 //	L.print(A);
 //	L.CleanMatrix();

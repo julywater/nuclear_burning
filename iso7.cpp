@@ -8,7 +8,7 @@ using namespace std;
 enum elements {he4,c12,o16,ne20,mg24,si28,ni56};
 enum rates {ircag,iroga,ir3a,irg3a,ir1212,ir1216,ir1616,iroag,irnega,irneag,irmgga,irmgag,irsiga,ircaag,irtiga,irni2si,irsi2ni,irsi2nida,irni2sida,irsi2nidsi};   
 
-void get_rate(double temp,double den,double y[N],double rate[NRATE]){
+void get_rate(double temp,double den,double rate[NRATE]){
 	int i;
 	double tt9,t9r,t9,t912,t913,t923,t943,t953,t932,t92,t93,t972,t9r32,t9i,t9i13,t9i23,t9i32,t9i12,t9ri,term,term1,term2,term3,rev,r2abe,t9a,t9a13,t9a56,t9a23,gt9h,rbeac,oneth,fivsix;
 	oneth = 1.0/3.0;
@@ -114,19 +114,40 @@ void get_rate(double temp,double den,double y[N],double rate[NRATE]){
 	
 //
 //	
-	if (t9>2.5&&(y[c12]+y[o16])>0.004){
-		rate[irsi2ni]=(pow(t9i32,3))*exp(239.42*t9i-74.741)*pow(den,3)*pow(y[he4],3)*rate[ircaag]*y[si28];
-		rate[irsi2nida]=3.0*rate[irsi2ni]/y[he4];
-		rate[irsi2nidsi]=rate[irsi2ni]/y[si28];
-		rate[irni2si]= min(1.0e20,pow(t932,3)* exp(-274.12*t9i+74.914) * rate[irtiga]/(pow(den,3)*pow(y[he4],3)));
-		rate[irni2sida]=-3.0*rate[irni2si]/y[he4];
-		if (rate[irni2si]==1.0e20) rate[irni2sida]=0;
+
+	if (t9>2.5){
+		rate[irsi2ni]=(pow(t9i32,3))*exp(239.42*t9i-74.741)*pow(den,3)*rate[ircaag];
+		rate[irsi2nida]=3.0*rate[irsi2ni];
+		rate[irsi2nidsi]=rate[irsi2ni];
+		rate[irni2si]= pow(t932,3)* exp(-274.12*t9i+74.914) * rate[irtiga]/pow(den,3);
+		rate[irni2sida]=-3.0*rate[irni2si];
+		
 	}
+
 
 //..the user may want to insert screening factors for the relevant rates here
 }
 
 void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
+
+//	
+	double  rate_irsi2ni=0;
+        double  rate_irsi2nida=0;
+        double  rate_irsi2nidsi=0;
+        double  rate_irni2si=0;
+        double  rate_irni2sida=0;
+
+	if ((y[c12]+y[o16])>0.004){
+		rate_irsi2ni=rate[irsi2ni]*pow(y[he4],3)*y[si28];
+		rate_irsi2nida=rate[irsi2nida]*pow(y[he4],2)*y[si28];
+		rate_irsi2nidsi=rate[irsi2nidsi]*pow(y[he4],3);
+		rate_irni2si=min(rate[irni2si]*pow(y[he4],3),1e20);
+		if(rate_irni2si==1e20)
+			rate_irni2sida=0;
+		else 
+			rate_irni2sida=rate[irni2sida]*pow(y[he4],2);
+	}
+
 	for(int i=0;i<N;i++)
 		for(int j=0;j<N;j++)
 			dfdy[i][j]=0;
@@ -135,8 +156,8 @@ void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 	dfdy[he4][o16] = rate[iroga]+0.5*y[c12]*rate[ir1216]+2.0*y[o16]*rate[ir1616]-y[he4]*rate[iroag];
 	dfdy[he4][ne20] = rate[irnega]-y[he4]*rate[irneag];
 	dfdy[he4][mg24] = rate[irmgga]-y[he4]*rate[irmgag];
-	dfdy[he4][si28] = rate[irsiga] -7.0* rate[irsi2nidsi]*y[he4];
-	dfdy[he4][ni56] =7.0*rate[irni2si];
+	dfdy[he4][si28] = rate[irsiga] -7.0* rate_irsi2nidsi*y[he4];
+	dfdy[he4][ni56] =7.0*rate_irni2si;
 
 	dfdy[c12][he4]=3.0*y[he4]*y[he4]*rate[ir3a]-y[c12]*rate[ircag];
 	dfdy[c12][c12]=-rate[irg3a]-y[he4]*rate[ircag]-4.0*y[c12]*rate[ir1212]-y[o16]* rate[ir1216];
@@ -164,23 +185,42 @@ void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 	dfdy[mg24][si28]= rate[irsiga];
 	
 	
-	dfdy[si28][he4]= y[mg24]*rate[irmgag]-rate[irsi2ni]-rate[irsi2nida]*y[he4]+rate[irni2sida]*y[ni56];
+	dfdy[si28][he4]= y[mg24]*rate[irmgag]-rate_irsi2ni-rate_irsi2nida*y[he4]+rate_irni2sida*y[ni56];
 	dfdy[si28][c12]=0.5*y[o16]*rate[ir1216];
 	dfdy[si28][o16]=2.0*y[o16]*rate[ir1616]+0.5*y[c12]*rate[ir1216];
 	dfdy[si28][mg24]=y[he4]*rate[irmgag];
-	dfdy[si28][si28]=-rate[irsiga]-rate[irsi2nidsi]*y[he4];
-	dfdy[si28][ni56]=rate[irni2si];
+	dfdy[si28][si28]=-rate[irsiga]-rate_irsi2nidsi*y[he4];
+	dfdy[si28][ni56]=rate_irni2si;
 	
-	dfdy[ni56][he4]=rate[irsi2ni]+rate[irsi2nida]*y[he4]-rate[irni2sida]*y[ni56];
-	dfdy[ni56][si28]=rate[irsi2nidsi]*y[he4];
-	dfdy[ni56][ni56]=-rate[irni2si];
+	dfdy[ni56][he4]=rate_irsi2ni+rate_irsi2nida*y[he4]-rate_irni2sida*y[ni56];
+	dfdy[ni56][si28]=rate_irsi2nidsi*y[he4];
+	dfdy[ni56][ni56]=-rate_irni2si;
 }
 void ydot(double rate[NRATE],double y[N],double dydt[N]){
+
+	double  rate_irsi2ni=0;
+        double  rate_irsi2nida=0;
+        double  rate_irsi2nidsi=0;
+        double  rate_irni2si=0;
+        double  rate_irni2sida=0;
+
+        if ((y[c12]+y[o16])>0.004){
+                rate_irsi2ni=rate[irsi2ni]*pow(y[he4],3)*y[si28];
+                rate_irsi2nida=rate[irsi2nida]*pow(y[he4],2)*y[si28];
+                rate_irsi2nidsi=rate[irsi2nidsi]*pow(y[he4],3);
+                rate_irni2si=min(rate[irni2si]*pow(y[he4],3),1e20);
+                if(rate_irni2si==1e20)
+                        rate_irni2sida=0;
+                else
+                        rate_irni2sida=rate[irni2sida]*pow(y[he4],2);
+        }
+
+
 	dydt[he4]= 3.0 * y[c12]* rate[irg3a]\
 - 3.0 * y[he4]*y[he4]*y[he4]* rate[ir3a]+ y[o16]* rate[iroga]- y[c12]*y[he4]* rate[ircag]\
 + y[c12]*y[c12]*rate[ir1212]+0.5* y[c12]*y[o16]*rate[ir1216]+y[o16]*y[o16]*rate[ir1616]\
 - y[o16]* y[he4]*rate[iroag]+y[ne20]*rate[irnega]+y[mg24]* rate[irmgga]-y[ne20]* y[he4]*rate[irneag]\
-+ y[si28]*rate[irsiga]-y[mg24]*y[he4]*rate[irmgag]-7.0*rate[irsi2ni]*y[he4]+7.0*rate[irni2si]*y[ni56];
++ y[si28]*rate[irsiga]-y[mg24]*y[he4]*rate[irmgag]-7.0*rate_irsi2ni*y[he4]+7.0*rate_irni2si*y[ni56];
 
 	
 	dydt[c12]= y[he4]*y[he4]*y[he4]*rate[ir3a] - y[c12]* rate[irg3a] + y[o16] * rate[iroga] - y[c12]*y[he4]*rate[ircag]-2.0* y[c12]*y[c12]*rate[ir1212]\
@@ -192,9 +232,9 @@ void ydot(double rate[NRATE],double y[N],double dydt[N]){
 	
 	dydt[mg24]=0.5*y[c12]*y[o16]*rate[ir1216]-y[mg24]*rate[irmgga]  + y[ne20]*y[he4]*rate[irneag]+y[si28]*rate[irsiga] - y[mg24]*y[he4]*rate[irmgag];
 	
-	dydt[si28]=0.5*y[c12]*y[o16]*rate[ir1216]+y[o16]*y[o16]*rate[ir1616] - y[si28]*rate[irsiga] + y[mg24]*y[he4]*rate[irmgag] - rate[irsi2ni]*y[he4] + rate[irni2si]*y[ni56];
+	dydt[si28]=0.5*y[c12]*y[o16]*rate[ir1216]+y[o16]*y[o16]*rate[ir1616] - y[si28]*rate[irsiga] + y[mg24]*y[he4]*rate[irmgag] - rate_irsi2ni*y[he4] + rate_irni2si*y[ni56];
 	
-	dydt[ni56]=rate[irsi2ni]*y[he4] - rate[irni2si]*y[ni56];
+	dydt[ni56]=rate_irsi2ni*y[he4] - rate_irni2si*y[ni56];
 	}
 
 
