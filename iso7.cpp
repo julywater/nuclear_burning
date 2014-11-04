@@ -7,8 +7,11 @@
 using namespace std;
 enum elements {he4,c12,o16,ne20,mg24,si28,ni56};
 enum rates {ircag,iroga,ir3a,irg3a,ir1212,ir1216,ir1616,iroag,irnega,irneag,irmgga,irmgag,irsiga,ircaag,irtiga,irni2si,irsi2ni,irsi2nida,irni2sida,irsi2nidsi};   
+double zion[N]={2,6,8,10,12,14,28};
+extern double aion[];
+void screen5(const double,const double,const double,const double,const double,const double,const double ,const double ,const double,const int ,const int ,double&,double&,double&);
 
-void get_rate(double temp,double den,double rate[NRATE]){
+void get_rate(double temp,double den,double y[N],double rate[NRATE]){
 	int i;
 	double tt9,t9r,t9,t912,t913,t923,t943,t953,t932,t92,t93,t972,t9r32,t9i,t9i13,t9i23,t9i32,t9i12,t9ri,term,term1,term2,term3,rev,r2abe,t9a,t9a13,t9a56,t9a23,gt9h,rbeac,oneth,fivsix;
 	oneth = 1.0/3.0;
@@ -127,7 +130,41 @@ void get_rate(double temp,double den,double rate[NRATE]){
 
 //..the user may want to insert screening factors for the relevant rates here
 }
+void screen(double temp,double den,double y[],double rate0[],double rate[]){
+	for(int i=0;i<NRATE;i++)
+		rate[i]=rate0[i];
+	double abar=0;
+	double zbar=0;
+	double z2bar=0;
+	for(int i=0;i<7;i++){
+       abar+=y[i];
+       zbar += zion[i]*y[i];
+       z2bar+= zion[i]*zion[i]*y[i];
+    }
+    abar=1.0/abar;
+    zbar= zbar*abar;
+    z2bar=z2bar*abar;
 
+
+	double sc1a,sc2a,scadt,scadd;
+	screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
+    screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],4.0,8.0,0,0,sc2a,scadt,scadd);
+	rate[ir3a]*=sc1a*sc2a;
+	screen5(temp,den,zbar,abar,z2bar, zion[c12],aion[c12],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
+    rate[ircag]*=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[c12],aion[c12],zion[c12],aion[c12], 0,0,sc1a,scadt,scadd);
+	rate[ir1212]*=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[c12],aion[c12],zion[o16],aion[o16],0,0,sc1a,scadt,scadd);
+	rate[ir1216]*=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[c12],aion[c12],zion[o16],aion[o16],0,0,sc1a,scadt,scadd);
+	rate[ir1216] *=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[o16],aion[o16],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
+	rate[iroag] *=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[ne20],aion[ne20],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
+    rate[irneag]*=sc1a;
+	screen5(temp,den,zbar,abar,z2bar,zion[mg24],aion[mg24],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
+    rate[irmgag]*=sc1a;
+	}
 void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 
 //	
@@ -137,7 +174,7 @@ void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
         double  rate_irni2si=0;
         double  rate_irni2sida=0;
 
-	if ((y[c12]+y[o16])>0.004){
+	if ((y[c12]+y[o16])<0.004){
 		rate_irsi2ni=rate[irsi2ni]*pow(y[he4],3)*y[si28];
 		rate_irsi2nida=rate[irsi2nida]*pow(y[he4],2)*y[si28];
 		rate_irsi2nidsi=rate[irsi2nidsi]*pow(y[he4],3);

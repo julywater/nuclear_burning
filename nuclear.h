@@ -16,7 +16,7 @@ class Linear_system{
 	double b[N];
 	
 	public :
-	Linear_system(double A[N][N]){
+	Linear_system(){
 		for(int row=0;row<N;row++)
 			for(int col=0;col<N;col++){
 				a[row][col]=0;
@@ -28,20 +28,21 @@ class Linear_system{
 			nzr[ind]=0;
 			nzc[ind]=0;
 			piv[ind]=0;
+			b[ind]=0;
 		}
-		for(int row=0;row<N;row++)
-			for(int col=0;col<N;col++)
-				if(A[row][col]!=0) *GetElementAddress(row,col)=A[row][col];
+//		for(int row=0;row<N;row++)
+//			for(int col=0;col<N;col++)
+//				if(A[row][col]!=0) *GetElementAddress(row,col)=A[row][col];
 		
 	}
-	void initial(double A[N][N],double B[N]){
+	void initial(double A[N][N]){
 	
 		for(int row=0;row<N;row++)
 			for(int col=0;col<N;col++)
 				if(A[row][col]!=0) *GetElementAddress(row,col)=A[row][col];
 //				a[row][col]=ap[row][col];
-		for(int ind=0;ind<N;ind++)
-			b[ind]=B[ind];
+//		for(int ind=0;ind<N;ind++)
+//			b[ind]=B[ind];
 	}
 		
 	double* GetElementAddress(int row, int col) {
@@ -168,6 +169,7 @@ class Linear_system{
 			y[i]+=b[piv[i]];
 	}
 };
+void screen(double,double,double [],double[],double []);
 void get_rate(double,double ,double [],double []);
 void jacob(double [],double [],double [N][N]);
 void ydot(double [],double [],double []);

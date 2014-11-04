@@ -27,7 +27,8 @@ void BD_onestep(double H,int m,double y[N],double rate[NRATE],double J[N][N]){
 				if(i==j) A[i][j]=1.0-h*J[i][j];
 				else A[i][j]=-h*J[i][j];
 		}		 //	A=1/h-J;
-	Linear_system L(A);
+	Linear_system L;
+	L.initial(A);
 	L.naivfct();
 	ydot(rate,y,B); //B=f(y)
 	for(int i=0;i<N;i++)
@@ -74,8 +75,12 @@ int BS_Method(double &H,double y0[N],double rate[NRATE],double J[N][N],int redo,
 		y2[i]=y0[i];
 		y6[i]=y0[i];
 	}
+	BD_onestep(H0,6,y6,rate,J);
+	
+	
 	BD_onestep(H0,2,y2,rate,J);
-	BD_onestep(H0,6,y6,rate,J);	
+
+
 	extroplate(y2,y6);
 	//ynew=extroplate(y2,y6);
 	double error[N]={0};
@@ -84,7 +89,7 @@ int BS_Method(double &H,double y0[N],double rate[NRATE],double J[N][N],int redo,
 	}
 	//error=|y6-y2|;
     	emax=findmax(error);
-	double TOL=1e-5;
+	double TOL=1e-6;
 //	cout<<redo<<"   "<<emax<<"   "<<H<<"   ";
 	if(emax<1e-12)
 		emax=1e-22;
@@ -98,6 +103,10 @@ int BS_Method(double &H,double y0[N],double rate[NRATE],double J[N][N],int redo,
 			y0[i]=y2[i];
 //		y0=y6;	
 	}
+//	cout<<H<<"   ";
+//	for(int i=0;i<N;i++)
+//		cout<<y6[i]<<"   ";
+	cout<<endl;
 	return(redo);
 	}
 	
@@ -108,17 +117,16 @@ int main(){
 		const double temp=2e9;
 		double time=0.0;
 		double time_end=1.0;
-		
-		clock_t t=clock();
-
 		int count=0;
-		double y0[N]={0.0011249,0.0772974,0.000132444,0.00143906,0.0013769,0.000142333,0};   
-//		double y0[N]={0.0/4,1.0/12,0.0,0,0,0,0};
+//		double y0[N]={0.0011249,0.0772974,0.000132444,0.00143906,0.0013769,0.000142333,0};   
+		double y0[N]={0.5/4,0.5/12,0.0,0,0,0,0};
+		double rate0[NRATE]={0};
 		double rate[NRATE]={0};
 		double J[N][N];
-		get_rate(temp,rho,rate);
+		get_rate(temp,rho,y0,rate0);
 //		while(time<time_end){
-		while(count<1){
+		while(count<50){
+			screen(temp,rho,y0,rate0,rate);
 			jacob(rate,y0,J);
 			int redo=false;
 			double emax=0;
@@ -131,18 +139,16 @@ int main(){
 				time+=H0;
 			H0=H;
 			count++;
-/*			
+			
 			cout<<time<<"   ";
 			for(int j=0;j<N;j++){
 				if(y0[j]<0) y0[j]=0;
 					cout<<y0[j]*aion[j]<<"    ";
 		}
 			cout<<endl;
-*/
+			
 		}
-		
-//		 t=clock()-t;
-// 	        printf ("It took me %d clicks (%f seconds).\n",t,((float)t)/CLOCKS_PER_SEC);
 
+		
 		return(0);
 }

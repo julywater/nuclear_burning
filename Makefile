@@ -1,5 +1,5 @@
 CC = g++
-OBJ = integral.o iso7.o
+OBJ = BD.o iso7.o screen5.o
 %.o: %.c
 	$(CC) -c $<
 nuc.exe: $(OBJ)
