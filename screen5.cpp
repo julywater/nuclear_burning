@@ -13,16 +13,19 @@
 #define gamefs  0.8
 #define blend_frac  0.05
 #define pi 3.1415926
+#define SIZE 9
 using namespace std;
-void screen5(const double temp,const double den,const double zbar,const double abar,const double z2bar,const double z1,const double a1,const double z2,const double a2,const int jscreen,const int init, double &scor,double &scordt,double&  scordd)
+void screen5(const double temp,const double den,const double zbar,const double abar,const double z2bar,double z1 [],double a1 [],double z2[],double a2[], double scor[],double scordt[],double scordd[])
 {
-	double zs13[10],zs13inv[10],zhat[10],zhat2[10],lzav[10],aznut[10];
-	zs13[jscreen]=pow((z1+z2),x13);
+	double zs13[SIZE],zs13inv[SIZE],zhat[SIZE],zhat2[SIZE],lzav[SIZE],aznut[SIZE];
+	for(int jscreen=0;jscreen<SIZE;jscreen++){
+	zs13[jscreen]=pow((z1[jscreen]+z2[jscreen]),x13);
 	zs13inv[jscreen]=1.0/zs13[jscreen];
-    zhat[jscreen]=pow((z1+z2),x53)-pow(z1,x53)-pow(z2,x53);
-    zhat2[jscreen]= pow((z1 + z2),x512)- pow(z1,x512)-pow(z2,x512);
-    lzav[jscreen]= x53 * log(z1*z2/(z1 + z2));
-    aznut[jscreen]= pow((z1*z1*z2*z2*a1*a2/(a1+a2)),x13);
+    zhat[jscreen]=pow((z1[jscreen]+z2[jscreen]),x53)-pow(z1[jscreen],x53)-pow(z2[jscreen],x53);
+    zhat2[jscreen]= pow((z1[jscreen]+z2[jscreen]),x512)- pow(z1[jscreen],x512)-pow(z2[jscreen],x512);
+    lzav[jscreen]= x53 * log(z1[jscreen]*z2[jscreen]/(z1[jscreen] + z2[jscreen]));
+    aznut[jscreen]= pow((z1[jscreen]*z1[jscreen]*z2[jscreen]*z2[jscreen]*a1[jscreen]*a2[jscreen]/(a1[jscreen]+a2[jscreen])),x13);
+	}
 	//abar zaber dependence
 	const double ytot=1.0/abar;
 	const double rr=den*ytot;
@@ -52,7 +55,8 @@ void screen5(const double temp,const double den,const double zbar,const double a
 	//
 	
 	//individual screen
-	double bb =z1 * z2;
+	for(int jscreen=0;jscreen<SIZE;jscreen++){
+	double bb =z1[jscreen]* z2[jscreen];
     double gamp= aa;
     double gampdt= daadt;
     double gampdd= daadd;
@@ -204,15 +208,16 @@ void screen5(const double temp,const double den,const double zbar,const double a
 //end of intermediate and strong screening if	
 //machine limit the output
       h12    = max(min(h12,300.0),0.0);
-      scor   = exp(h12);
+      scor[jscreen]= exp(h12);
       if (h12 == 300.00){
-       scordt = 0.0;
-       scordd = 0.0;
+       scordt[jscreen]= 0.0;
+       scordd[jscreen]= 0.0;
 	   }
       else {
-       scordt = scor * dh12dt;
-       scordd = scor * dh12dd;
+       scordt[jscreen]= scor[jscreen]* dh12dt;
+       scordd[jscreen]= scor[jscreen]* dh12dd;
       }
+	  }
 }
 
 

@@ -9,7 +9,7 @@ enum elements {he4,c12,o16,ne20,mg24,si28,ni56};
 enum rates {ircag,iroga,ir3a,irg3a,ir1212,ir1216,ir1616,iroag,irnega,irneag,irmgga,irmgag,irsiga,ircaag,irtiga,irni2si,irsi2ni,irsi2nida,irni2sida,irsi2nidsi};   
 double zion[N]={2,6,8,10,12,14,28};
 extern double aion[];
-void screen5(const double,const double,const double,const double,const double,const double,const double ,const double ,const double,const int ,const int ,double&,double&,double&);
+void screen5(const double,const double,const double,const double,const double,double [],double [],double [],double [],double [],double[],double[]);
 
 void get_rate(double temp,double den,double y[N],double rate[NRATE]){
 	int i;
@@ -144,8 +144,22 @@ void screen(double temp,double den,double y[],double rate0[],double rate[]){
     abar=1.0/abar;
     zbar= zbar*abar;
     z2bar=z2bar*abar;
-
-
+	double sca[9],scadt[9],scadd[9];
+	double z1[9]={zion[he4],zion[he4],zion[c12],zion[c12],zion[c12],zion[o16],zion[o16],zion[ne20],zion[mg24]};
+	double a1[9]={aion[he4],aion[he4],aion[c12],aion[c12],aion[c12],aion[o16],aion[o16],aion[ne20],aion[mg24]};
+	double z2[9]={zion[he4],4,zion[he4],zion[c12],zion[o16],zion[o16],zion[he4],zion[he4],zion[he4]};
+	double a2[9]={aion[he4],4,aion[he4],aion[c12],aion[o16],aion[o16],aion[he4],aion[he4],aion[he4]};
+	screen5(temp,den,zbar,abar,z2bar,z1,a1,z2,a2,sca,scadt,scadd);
+	rate[ir3a]*=sca[0]*sca[1];
+	rate[ircag]*=sca[2];
+	rate[ir1212]*=sca[3];
+	rate[ir1216]*=sca[4];
+	rate[ir1616]*=sca[5];
+//	rate[ir1216] possible bug in Timmes
+	rate[iroag]*= sca[6];
+	rate[irneag]*=sca[7];
+	rate[irmgag]*=sca[8];
+/*
 	double sc1a,sc2a,scadt,scadd;
 	screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
     screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],4.0,8.0,0,0,sc2a,scadt,scadd);
@@ -159,11 +173,13 @@ void screen(double temp,double den,double y[],double rate0[],double rate[]){
 	screen5(temp,den,zbar,abar,z2bar,zion[c12],aion[c12],zion[o16],aion[o16],0,0,sc1a,scadt,scadd);
 	rate[ir1216] *=sc1a;
 	screen5(temp,den,zbar,abar,z2bar,zion[o16],aion[o16],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
-	rate[iroag] *=sc1a;
+	ratdum(iroag)    = ratraw(iroag) * sc1a
 	screen5(temp,den,zbar,abar,z2bar,zion[ne20],aion[ne20],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
     rate[irneag]*=sc1a;
 	screen5(temp,den,zbar,abar,z2bar,zion[mg24],aion[mg24],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
     rate[irmgag]*=sc1a;
+	
+*/
 	}
 void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 
