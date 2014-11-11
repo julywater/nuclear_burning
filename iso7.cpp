@@ -160,6 +160,15 @@ void screen(double temp,double den,double y[],double rate0[],double rate[]){
 	rate[irneag]*=sca[7];
 	rate[irmgag]*=sca[8];
 /*
+	if(y[c12]+y[o16]>0.004) {
+		rate[irsi2ni]=0;
+       		rate[irsi2nida]=0;
+        	rate[irsi2nidsi]=0;
+      		rate[irni2si]=0;
+        	rate[irni2sida]=0;
+	}
+*/		
+/*
 	double sc1a,sc2a,scadt,scadd;
 	screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],zion[he4],aion[he4],0,0,sc1a,scadt,scadd);
     screen5(temp,den,zbar,abar,z2bar,zion[he4],aion[he4],4.0,8.0,0,0,sc2a,scadt,scadd);
@@ -204,7 +213,7 @@ void jacob(double rate[NRATE],double y[N],double dfdy[N][N]){
 	for(int i=0;i<N;i++)
 		for(int j=0;j<N;j++)
 			dfdy[i][j]=0;
-	dfdy[he4][he4] = -6.0* y[he4] * y[he4] * rate[ir3a]-y[c12]*rate[ircag]-y[o16]* rate[iroag]-y[ne20]*rate[irneag]- y[mg24]*rate[irmgag]-7.0* rate[irsi2ni]- 7.0*rate[irsi2nida]*y[he4]+7*rate[irni2sida]*y[ni56];
+	dfdy[he4][he4] = -6.0* y[he4] * y[he4] * rate[ir3a]-y[c12]*rate[ircag]-y[o16]* rate[iroag]-y[ne20]*rate[irneag]- y[mg24]*rate[irmgag]-7.0* rate_irsi2ni- 7.0*rate_irsi2nida*y[he4]+7*rate_irni2sida*y[ni56];
 	dfdy[he4][c12] = 3.0*rate[irg3a]-y[he4]*rate[ircag] + 2.0 * y[c12]*rate[ir1212]+0.5* y[o16]*rate[ir1216];
 	dfdy[he4][o16] = rate[iroga]+0.5*y[c12]*rate[ir1216]+2.0*y[o16]*rate[ir1616]-y[he4]*rate[iroag];
 	dfdy[he4][ne20] = rate[irnega]-y[he4]*rate[irneag];
@@ -257,7 +266,7 @@ void ydot(double rate[NRATE],double y[N],double dydt[N]){
         double  rate_irni2si=0;
         double  rate_irni2sida=0;
 
-        if ((y[c12]+y[o16])>0.004){
+        if ((y[c12]+y[o16])<0.004){
                 rate_irsi2ni=rate[irsi2ni]*pow(y[he4],3)*y[si28];
                 rate_irsi2nida=rate[irsi2nida]*pow(y[he4],2)*y[si28];
                 rate_irsi2nidsi=rate[irsi2nidsi]*pow(y[he4],3);
